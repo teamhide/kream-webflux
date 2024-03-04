@@ -1,4 +1,4 @@
-package com.teamhide.kream.common.filter
+package com.teamhide.kream.common.filter.log
 
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange

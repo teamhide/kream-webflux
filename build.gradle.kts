@@ -31,6 +31,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("io.asyncer:r2dbc-mysql:1.1.0")
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+    implementation("io.micrometer:context-propagation:1.1.1")
 
     runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64")
 

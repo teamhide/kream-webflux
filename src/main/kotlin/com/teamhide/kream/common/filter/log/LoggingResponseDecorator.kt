@@ -1,4 +1,4 @@
-package com.teamhide.kream.common.filter
+package com.teamhide.kream.common.filter.log
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.reactivestreams.Publisher

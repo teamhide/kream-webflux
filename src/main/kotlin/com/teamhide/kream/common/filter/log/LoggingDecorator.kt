@@ -1,4 +1,4 @@
-package com.teamhide.kream.common.filter
+package com.teamhide.kream.common.filter.log
 
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.http.server.reactive.ServerHttpResponse
