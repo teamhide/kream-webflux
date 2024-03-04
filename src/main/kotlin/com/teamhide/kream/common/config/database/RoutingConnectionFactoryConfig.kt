@@ -62,7 +62,7 @@ class RoutingConnectionFactoryConfig(
                 .option(PORT, property.port)
                 .option(USER, property.user)
                 .option(PASSWORD, property.password)
-                .option(DATABASE, property.password)
+                .option(DATABASE, property.database)
                 .option(MySqlConnectionFactoryProvider.SERVER_ZONE_ID, ZoneId.of("Asia/Seoul"))
                 .build()
         )
