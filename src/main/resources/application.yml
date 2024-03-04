@@ -1,0 +1,58 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    group:
+      default: clients
+      test: clients-test
+      staging: clients-staging
+      prod: clients-prod
+  mvc:
+    static-path-pattern: /test/**
+  main:
+    banner-mode: off
+  r2dbc:
+    writer:
+      driver: pool
+      protocol: mysql
+      host: localhost
+      port: 33061
+      user: kream
+      password: kream
+      database: kream
+    reader:
+      driver: pool
+      protocol: mysql
+      host: localhost
+      port: 33061
+      user: kream
+      password: kream
+      database: kream
+  data:
+    redis:
+      host: localhost
+      port: 63792
+    mongodb:
+      uri: mongodb://kream:kream@localhost:27017/kream?authSource=admin
+      database: kream
+  kafka:
+    schema:
+      registry:
+        url: localhost:8081
+    bootstrap-servers: localhost:9092
+    topic:
+      bidding-created: kream.bidding.created
+      bidding-completed: kream.bidding.completed
+jwt:
+  secret-key: hidehidehidehidehidehidehidehidehide
+logging:
+  level:
+    org.springframework.kafka.*: OFF
+    org.springframework.kafka.listener.[KafkaMessageListenerContainer$ListenerConsumer]: OFF
+    org.apache.kafka.*: OFF
+    kafka.*: OFF
+    org.apache.zookeeper.*: OFF
+
+client:
+  pg:
+    url: http://localhost:8080
