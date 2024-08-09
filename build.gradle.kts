@@ -21,7 +21,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -29,22 +28,22 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("io.asyncer:r2dbc-mysql:1.1.0")
-    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+    implementation("io.asyncer:r2dbc-mysql:1.1.2")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
     implementation("io.micrometer:context-propagation:1.1.1")
 
-    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64")
+    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.112.Final:osx-aarch_64")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.6.2")
-    testImplementation("io.kotest:kotest-framework-datatest:5.6.2")
-    testImplementation("io.kotest:kotest-assertions-core:5.6.2")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
-    testImplementation("io.mockk:mockk:1.13.3")
-    testImplementation("com.ninja-squad:springmockk:4.0.0")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.9.0")
+    testImplementation("io.kotest:kotest-framework-datatest:5.9.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("com.squareup.okhttp3:okhttp:4.11.0")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 }
 
 val testAll by tasks.registering {

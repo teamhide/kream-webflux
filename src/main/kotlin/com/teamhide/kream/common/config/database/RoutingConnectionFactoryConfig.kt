@@ -29,12 +29,12 @@ class RoutingConnectionFactoryConfig(
     @Bean
     override fun connectionFactory(): ConnectionFactory {
         val routingConnectionFactory = RoutingConnectionFactory()
-        val connectionFactoryMap = HashMap<Any, Any>()
-
         val writerConnectionFactory = writerConnectionFactory()
         val readerConnectionFactory = readerConnectionFactory()
-        connectionFactoryMap[ConnectionFactoryType.WRITER] = writerConnectionFactory
-        connectionFactoryMap[ConnectionFactoryType.READER] = readerConnectionFactory
+        val connectionFactoryMap = mapOf(
+            ConnectionFactoryType.WRITER to writerConnectionFactory,
+            ConnectionFactoryType.READER to readerConnectionFactory,
+        )
 
         routingConnectionFactory.setTargetConnectionFactories(connectionFactoryMap)
         routingConnectionFactory.setDefaultTargetConnectionFactory(writerConnectionFactory)
