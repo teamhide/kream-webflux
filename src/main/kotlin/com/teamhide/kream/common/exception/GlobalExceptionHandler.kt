@@ -30,6 +30,7 @@ class GlobalExceptionHandler {
         val body = FailBody(errorCode = errorConst.errorCode, message = errorConst.message)
         return ApiResponse.fail(body, errorConst.statusCode)
     }
+
     @ExceptionHandler(Exception::class)
     suspend fun handleException(e: Exception): ApiResponse<FailBody> {
         val errorConst = CommonErrorConst.UNKNOWN

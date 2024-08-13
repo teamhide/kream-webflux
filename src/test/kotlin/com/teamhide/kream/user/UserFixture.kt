@@ -1,0 +1,5 @@
+package com.teamhide.kream.user
+
+const val EXPIRED_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDE3NTk5MTAsImV4cCI6MTcwMTc1OTk5NywidXNlcl9pZCI6MX0.a3gyosESbCJ_-adDmkPUUa7hrdx2zQe1xebUV252jb8"
+const val USER_ID_1_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.JWd_KhG7M3FTQOlUVujmAEQ9b3a0pU2a74b-3ehboAE"
+const val USER_ID_2_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyfQ.0xRiB1wfPN9nuJ_6UtDBJAxhAfuJ_qnUuo_Bgfhjlb0"
