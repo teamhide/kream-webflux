@@ -26,22 +26,9 @@ class RoutingConnectionFactoryConfig(
 ) : AbstractR2dbcConfiguration() {
     @Bean
     override fun connectionFactory(): ConnectionFactory {
-        val readerConnectionFactory = createConnectionFactory(
-            property = connectionFactoryProperties.reader,
-        )
-        val writerConnectionFactory = createConnectionFactory(
+        return createConnectionFactory(
             property = connectionFactoryProperties.writer,
         )
-        val routingConnectionFactory = RoutingConnectionFactory().apply {
-            setTargetConnectionFactories(
-                mapOf(
-                    ConnectionFactoryType.WRITER to readerConnectionFactory,
-                    ConnectionFactoryType.READER to writerConnectionFactory,
-                )
-            )
-            setDefaultTargetConnectionFactory(readerConnectionFactory)
-        }
-        return routingConnectionFactory
     }
 
     @Bean
@@ -67,4 +54,24 @@ class RoutingConnectionFactoryConfig(
                 .build()
         )
     }
+
+    // TODO: Apply routing, currently error with org.springframework.transaction.reactive.TransactionContextManager$NoTransactionInContextException: No transaction in context
+//    @Bean
+//    override fun connectionFactory(): ConnectionFactory {
+//        val readerConnectionFactory = createConnectionFactory(
+//            property = connectionFactoryProperties.reader,
+//        )
+//        val writerConnectionFactory = createConnectionFactory(
+//            property = connectionFactoryProperties.writer,
+//        )
+//        val maps =                 mapOf(
+//            ConnectionFactoryType.WRITER to readerConnectionFactory,
+//            ConnectionFactoryType.READER to writerConnectionFactory,
+//        )
+//        val routingConnectionFactory = RoutingConnectionFactory().apply {
+//            setTargetConnectionFactories(maps)
+//            setDefaultTargetConnectionFactory(readerConnectionFactory)
+//        }
+//        return routingConnectionFactory
+//    }
 }
