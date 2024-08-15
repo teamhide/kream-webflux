@@ -24,5 +24,17 @@ services:
     ports:
       - "63792:6379"
 
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_DATABASE: kream
+      MONGO_INITDB_ROOT_USERNAME: kream
+      MONGO_INITDB_ROOT_PASSWORD: kream
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb:/data/db
+
 volumes:
   mysqldb:
+  mongodb:
