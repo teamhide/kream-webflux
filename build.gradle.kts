@@ -33,6 +33,10 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
     implementation("io.micrometer:context-propagation:1.1.1")
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-mysql")
+    implementation("com.mysql:mysql-connector-j")
 
     runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.112.Final:osx-aarch_64")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")

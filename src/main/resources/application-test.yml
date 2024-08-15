@@ -19,7 +19,7 @@ spring:
       port: 33061
       user: kream
       password: kream
-      database: kream
+      database: kream_test
     reader:
       driver: pool
       protocol: mysql
@@ -27,18 +27,18 @@ spring:
       port: 33061
       user: kream
       password: kream
-      database: kream
+      database: kream_test
   data:
     redis:
       host: localhost
       port: 63792
     mongodb:
-      uri: mongodb://kream:kream@localhost:27017/kream?authSource=admin
-      database: kream
+      uri: mongodb://kream:kream@localhost:27017/kream_test?authSource=admin
+      database: kream_test
   flyway:
     enabled: true
     baseline-on-migrate: true
-    url: jdbc:mysql://localhost:33061/kream?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:33061/kream_test?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     user: kream
     password: kream
     locations: classpath:db/migration
