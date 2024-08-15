@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.reactive.resource.NoResourceFoundException
 import org.springframework.web.server.ServerWebInputException
 
 internal class GlobalExceptionHandlerTest : BehaviorSpec({
@@ -70,6 +71,22 @@ internal class GlobalExceptionHandlerTest : BehaviorSpec({
 
         When("예외 핸들러가 동작하면") {
             val sut = handler.handleServerWebInputException(e = exc)
+
+            Then("FailBody로 감싸서 반환된다") {
+                sut.body?.errorCode shouldBe errorConst.errorCode
+                sut.body?.message shouldBe errorConst.message
+                sut.statusCode shouldBe errorConst.statusCode
+            }
+        }
+    }
+
+    Given("NoResourceFoundException 발생하는 경우") {
+        val exc = NoResourceFoundException("error")
+        val handler = GlobalExceptionHandler()
+        val errorConst = CommonErrorConst.NO_RESOURCE_FOUND_ERROR
+
+        When("예외 핸들러가 동작하면") {
+            val sut = handler.handleNoResourceFoundException(e = exc)
 
             Then("FailBody로 감싸서 반환된다") {
                 sut.body?.errorCode shouldBe errorConst.errorCode

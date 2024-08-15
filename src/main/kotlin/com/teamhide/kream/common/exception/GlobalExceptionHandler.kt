@@ -7,6 +7,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.reactive.resource.NoResourceFoundException
 import org.springframework.web.server.ServerWebInputException
 
 private val logger = KotlinLogging.logger { }
@@ -35,6 +36,13 @@ class GlobalExceptionHandler {
     @ExceptionHandler(ServerWebInputException::class)
     suspend fun handleServerWebInputException(e: ServerWebInputException): ApiResponse<FailBody> {
         val errorConst = CommonErrorConst.SERVER_WEB_INPUT_ERROR
+        val body = FailBody(errorCode = errorConst.errorCode, message = errorConst.message)
+        return ApiResponse.fail(body, errorConst.statusCode)
+    }
+
+    @ExceptionHandler(NoResourceFoundException::class)
+    fun handleNoResourceFoundException(e: NoResourceFoundException): ApiResponse<FailBody> {
+        val errorConst = CommonErrorConst.NO_RESOURCE_FOUND_ERROR
         val body = FailBody(errorCode = errorConst.errorCode, message = errorConst.message)
         return ApiResponse.fail(body, errorConst.statusCode)
     }
