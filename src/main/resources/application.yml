@@ -29,6 +29,9 @@ spring:
       password: kream
       database: kream
   data:
+    r2dbc:
+      repositories:
+        enabled: true
     redis:
       host: localhost
       port: 63792

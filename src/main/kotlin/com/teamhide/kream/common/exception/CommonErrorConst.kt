@@ -11,6 +11,7 @@ enum class CommonErrorConst(val errorCode: String, val message: String, val stat
         "Http request method not supported",
         HttpStatus.METHOD_NOT_ALLOWED
     ),
+    SERVER_WEB_INPUT_ERROR("SERVER_WEB_INPUT_ERROR", "Server web input error", HttpStatus.BAD_REQUEST),
     METHOD_ARGUMENT_NOT_VALID(
         "METHOD_ARGUMENT_NOT_VALID", "Method argument not valid", HttpStatus.BAD_REQUEST
     ),

@@ -17,6 +17,7 @@ import org.springframework.r2dbc.connection.R2dbcTransactionManager
 import org.springframework.r2dbc.connection.TransactionAwareConnectionFactoryProxy
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import org.springframework.transaction.reactive.TransactionalOperator
 
 @Configuration
 @EnableTransactionManagement
@@ -41,6 +42,11 @@ class RoutingConnectionFactoryConfig(
             setDefaultTargetConnectionFactory(readerConnectionFactory)
         }
         return routingConnectionFactory
+    }
+
+    @Bean
+    fun transactionalOperator(reactiveTransactionManager: ReactiveTransactionManager): TransactionalOperator {
+        return TransactionalOperator.create(reactiveTransactionManager)
     }
 
     @Bean
