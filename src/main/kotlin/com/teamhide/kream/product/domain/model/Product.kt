@@ -33,4 +33,24 @@ data class Product(
             throw InvalidReleasePriceException()
         }
     }
+
+    companion object {
+        fun create(
+            name: String,
+            releasePrice: Int,
+            modelNumber: String,
+            sizeType: SizeType,
+            productBrandId: Long,
+            productCategoryId: Long,
+        ): Product {
+            return Product(
+                name = name,
+                releasePrice = releasePrice,
+                modelNumber = modelNumber,
+                sizeType = sizeType,
+                productBrandId = productBrandId,
+                productCategoryId = productCategoryId,
+            )
+        }
+    }
 }

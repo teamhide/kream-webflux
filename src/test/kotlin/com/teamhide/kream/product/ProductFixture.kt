@@ -6,9 +6,11 @@ import com.teamhide.kream.product.domain.model.ProductCategory
 import com.teamhide.kream.product.domain.model.ProductDisplay
 import com.teamhide.kream.product.domain.model.SizeType
 import com.teamhide.kream.product.domain.repository.ProductInfoDto
+import com.teamhide.kream.product.domain.usecase.RegisterProductCommand
+import com.teamhide.kream.product.ui.api.dto.RegisterProductRequest
 
 fun makeProductCategory(
-    id: Long = 1L,
+    id: Long = 0L,
     name: String = "categoryName",
     parentCategoryId: Long = 1L,
 ): ProductCategory {
@@ -20,14 +22,14 @@ fun makeProductCategory(
 }
 
 fun makeProductBrand(
-    id: Long = 1L,
+    id: Long = 0L,
     name: String = "brandName",
 ): ProductBrand {
     return ProductBrand(id = id, name = name)
 }
 
 fun makeProduct(
-    id: Long = 1L,
+    id: Long = 0L,
     name: String = "productName",
     releasePrice: Int = 1000,
     modelNumber: String = "A-123",
@@ -47,7 +49,7 @@ fun makeProduct(
 }
 
 fun makeProductInfoDto(
-    productId: Long = 1L,
+    productId: Long = 0L,
     releasePrice: Int = 20000,
     modelNumber: String = "A-123",
     name: String = "SAKAI",
@@ -65,7 +67,7 @@ fun makeProductInfoDto(
 }
 
 fun makeProductDisplay(
-    productId: Long = 1L,
+    productId: Long = 0L,
     name: String = "name",
     price: Int = 10000,
     brand: String = "Nike",
@@ -79,5 +81,41 @@ fun makeProductDisplay(
         brand = brand,
         category = category,
         lastBiddingId = lastBiddingId,
+    )
+}
+
+fun makeRegisterProductCommand(
+    name: String = "name",
+    releasePrice: Int = 1000,
+    modelNumber: String = "A-123",
+    sizeType: SizeType = SizeType.CLOTHES,
+    brandId: Long = 1L,
+    categoryId: Long = 1L,
+): RegisterProductCommand {
+    return RegisterProductCommand(
+        name = name,
+        releasePrice = releasePrice,
+        modelNumber = modelNumber,
+        sizeType = sizeType,
+        brandId = brandId,
+        categoryId = categoryId,
+    )
+}
+
+fun makeRegisterProductRequest(
+    name: String = "CLUNY",
+    releasePrice: Int = 59000,
+    modelNumber: String = "B-123",
+    sizeType: SizeType = SizeType.CLOTHES,
+    brandId: Long = 1L,
+    categoryId: Long = 1L,
+): RegisterProductRequest {
+    return RegisterProductRequest(
+        name = name,
+        releasePrice = releasePrice,
+        modelNumber = modelNumber,
+        sizeType = sizeType,
+        brandId = brandId,
+        categoryId = categoryId,
     )
 }

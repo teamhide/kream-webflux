@@ -13,7 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 
-private const val URL = "/api/v1/user"
+private const val URL = "/v1/user"
 
 @IntegrationTest
 class UserV1ControllerTest(

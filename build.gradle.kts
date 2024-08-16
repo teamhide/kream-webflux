@@ -72,17 +72,6 @@ tasks.test {
     outputs.dir(snippetsDir)
 }
 
-tasks.register("testUnit", Test::class) {
-    useJUnitPlatform()
-    systemProperties["spring.profiles.active"] = "test"
-    exclude("**/*ControllerTest*")
-}
-
-tasks.register("teste2e", Test::class) {
-    useJUnitPlatform()
-    systemProperties["spring.profiles.active"] = "test"
-    include("**/*ControllerTest*")
-}
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {

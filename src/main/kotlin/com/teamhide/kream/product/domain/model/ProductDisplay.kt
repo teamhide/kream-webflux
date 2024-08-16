@@ -29,6 +29,19 @@ class ProductDisplay(
     @Id
     val id: ObjectId = ObjectId(),
 ) : BaseTimestampEntity() {
+    companion object {
+        fun create(productId: Long, name: String, brand: String, category: String): ProductDisplay {
+            return ProductDisplay(
+                productId = productId,
+                name = name,
+                price = 0,
+                brand = brand,
+                category = category,
+                lastBiddingId = null,
+            )
+        }
+    }
+
     fun changePrice(price: Int) {
         this.price = price
     }

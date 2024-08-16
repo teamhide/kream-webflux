@@ -59,6 +59,8 @@ logging:
     org.apache.kafka.*: OFF
     kafka.*: OFF
     org.apache.zookeeper.*: OFF
+    io.r2dbc.postgresql.QUERY: DEBUG # for queries
+    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
 
 client:
   pg:
