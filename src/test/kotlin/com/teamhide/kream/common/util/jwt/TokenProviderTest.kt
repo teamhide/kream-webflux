@@ -10,10 +10,10 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import java.nio.charset.MalformedInputException
 
 private const val secretKey = "hidehidehidehidehidehidehidehidehide"
@@ -21,8 +21,8 @@ private const val secretKey = "hidehidehidehidehidehidehidehidehide"
 internal class TokenProviderTest : StringSpec({
     val provider = TokenProvider(secretKey = secretKey)
 
-    beforeEach {
-        clearAllMocks()
+    afterEach {
+        unmockkStatic(Jwts::class)
     }
 
     "토큰을 발행한다" {
