@@ -1,16 +1,31 @@
 package com.teamhide.kream.product.application.service
 
+import com.teamhide.kream.product.application.exception.ProductNotFoundException
+import com.teamhide.kream.product.domain.model.BiddingType
+import com.teamhide.kream.product.domain.repository.BiddingRepositoryAdapter
 import com.teamhide.kream.product.domain.repository.ProductDisplayRepositoryAdapter
+import com.teamhide.kream.product.domain.repository.ProductRepositoryAdapter
 import com.teamhide.kream.product.domain.usecase.GetAllProductQuery
+import com.teamhide.kream.product.domain.usecase.GetProductDetailQuery
+import com.teamhide.kream.product.makeBidding
 import com.teamhide.kream.product.makeProductDisplay
+import com.teamhide.kream.product.makeProductInfo
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
 
 class ProductQueryServiceTest : BehaviorSpec({
     val productDisplayRepositoryAdapter = mockk<ProductDisplayRepositoryAdapter>()
-    val productQueryService = ProductQueryService(productDisplayRepositoryAdapter = productDisplayRepositoryAdapter)
+    val biddingRepositoryAdapter = mockk<BiddingRepositoryAdapter>()
+    val productRepositoryAdapter = mockk<ProductRepositoryAdapter>()
+    val productQueryService = ProductQueryService(
+        productDisplayRepositoryAdapter = productDisplayRepositoryAdapter,
+        biddingRepositoryAdapter = biddingRepositoryAdapter,
+        productRepositoryAdapter = productRepositoryAdapter,
+    )
 
     Given("page와 size를 통해") {
         val query = GetAllProductQuery(page = 0, size = 20)
@@ -34,6 +49,75 @@ class ProductQueryServiceTest : BehaviorSpec({
                 sut[1].price shouldBe productDisplay2.price
                 sut[1].brand shouldBe productDisplay2.brand
                 sut[1].category shouldBe productDisplay2.category
+            }
+        }
+    }
+
+    Given("없는 상품을 대상으로") {
+        val query = GetProductDetailQuery(productId = 1L)
+        coEvery { productRepositoryAdapter.findInfoById(any()) } returns null
+
+        When("상세 정보 조회를 요청하면") {
+            Then("예외가 발생한다") {
+                shouldThrow<ProductNotFoundException> {
+                    productQueryService.getDetailById(query = query)
+                }
+            }
+        }
+    }
+
+    Given("입찰 정보가 없는 상품에 대해") {
+        val productInfo = makeProductInfo()
+        coEvery { productRepositoryAdapter.findInfoById(any()) } returns productInfo
+
+        coEvery { biddingRepositoryAdapter.findMostExpensiveBidding(any(), any()) } returns null
+
+        coEvery { biddingRepositoryAdapter.findMostCheapestBidding(any(), any()) } returns null
+
+        val query = GetProductDetailQuery(productId = productInfo.productId)
+
+        When("상세 정보 조회를 요청하면") {
+            val sut = productQueryService.getDetailById(query = query)
+
+            Then("입찰 가격을 제외한 정보를 채워서 리턴한다") {
+                sut.shouldNotBeNull()
+                sut.productId shouldBe productInfo.productId
+                sut.releasePrice shouldBe productInfo.releasePrice
+                sut.modelNumber shouldBe productInfo.modelNumber
+                sut.name shouldBe productInfo.name
+                sut.brand shouldBe productInfo.brand
+                sut.category shouldBe productInfo.category
+                sut.purchaseBidPrice shouldBe null
+                sut.saleBidPrice shouldBe null
+            }
+        }
+    }
+
+    Given("입찰 정보가 존재하는 상품에 대해") {
+        val productInfo = makeProductInfo()
+        coEvery { productRepositoryAdapter.findInfoById(any()) } returns productInfo
+
+        val mostExpensiveBidding = makeBidding(price = 20000, productId = productInfo.productId, biddingType = BiddingType.PURCHASE)
+        coEvery { biddingRepositoryAdapter.findMostExpensiveBidding(any(), any()) } returns mostExpensiveBidding
+
+        val mostCheapestBidding = makeBidding(price = 1000, productId = productInfo.productId, biddingType = BiddingType.SALE)
+        coEvery { biddingRepositoryAdapter.findMostCheapestBidding(any(), any()) } returns mostCheapestBidding
+
+        val query = GetProductDetailQuery(productId = productInfo.productId)
+
+        When("상세 정보 조회를 요청하면") {
+            val sut = productQueryService.getDetailById(query = query)
+
+            Then("모든 정보를 채워서 리턴한다") {
+                sut.shouldNotBeNull()
+                sut.productId shouldBe productInfo.productId
+                sut.releasePrice shouldBe productInfo.releasePrice
+                sut.modelNumber shouldBe productInfo.modelNumber
+                sut.name shouldBe productInfo.name
+                sut.brand shouldBe productInfo.brand
+                sut.category shouldBe productInfo.category
+                sut.purchaseBidPrice shouldBe mostCheapestBidding.price
+                sut.saleBidPrice shouldBe mostExpensiveBidding.price
             }
         }
     }

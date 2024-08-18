@@ -1,9 +1,16 @@
 package com.teamhide.kream.product
 
+import com.teamhide.kream.product.domain.model.Bidding
+import com.teamhide.kream.product.domain.model.BiddingStatus
+import com.teamhide.kream.product.domain.model.BiddingType
+import com.teamhide.kream.product.domain.model.Order
+import com.teamhide.kream.product.domain.model.OrderStatus
 import com.teamhide.kream.product.domain.model.Product
 import com.teamhide.kream.product.domain.model.ProductBrand
 import com.teamhide.kream.product.domain.model.ProductCategory
 import com.teamhide.kream.product.domain.model.ProductDisplay
+import com.teamhide.kream.product.domain.model.ProductInfo
+import com.teamhide.kream.product.domain.model.SaleHistory
 import com.teamhide.kream.product.domain.model.SizeType
 import com.teamhide.kream.product.domain.repository.ProductInfoDto
 import com.teamhide.kream.product.domain.usecase.RegisterProductCommand
@@ -117,5 +124,73 @@ fun makeRegisterProductRequest(
         sizeType = sizeType,
         brandId = brandId,
         categoryId = categoryId,
+    )
+}
+
+fun makeBidding(
+    id: Long = 0L,
+    productId: Long = 1L,
+    userId: Long = 1L,
+    price: Int = 20000,
+    size: String = "M",
+    status: BiddingStatus = BiddingStatus.IN_PROGRESS,
+    biddingType: BiddingType = BiddingType.SALE,
+): Bidding {
+    return Bidding(
+        id = id,
+        productId = productId,
+        userId = userId,
+        price = price,
+        size = size,
+        status = status,
+        biddingType = biddingType,
+    )
+}
+
+fun makeSaleHistory(
+    biddingId: Long = 1L,
+    userId: Long = 1L,
+    price: Int = 20000,
+    size: String = "M"
+): SaleHistory {
+    return SaleHistory(
+        biddingId = biddingId,
+        userId = userId,
+        price = price,
+        size = size,
+    )
+}
+
+fun makeOrder(
+    id: Long = 0L,
+    paymentId: String = "paymentId",
+    biddingId: Long = 1L,
+    userId: Long = 1L,
+    status: OrderStatus = OrderStatus.COMPLETE,
+): Order {
+    return Order(
+        id = id,
+        paymentId = paymentId,
+        biddingId = biddingId,
+        userId = userId,
+        status = status,
+    )
+}
+
+fun makeProductInfo(
+    productId: Long = 1L,
+    releasePrice: Int = 20000,
+    modelNumber: String = "A-123",
+    name: String = "name",
+    brand: String = "NIKE",
+    category: String = "SHOES",
+): ProductInfo {
+    return ProductInfo(
+        productId = productId,
+        releasePrice = releasePrice,
+        modelNumber = modelNumber,
+        name = name,
+        brand = brand,
+        category = category,
     )
 }

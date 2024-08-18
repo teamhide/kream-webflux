@@ -2,11 +2,16 @@ package com.teamhide.kream.product.ui.api
 
 import com.teamhide.kream.product.application.exception.ProductBrandNotFoundException
 import com.teamhide.kream.product.application.exception.ProductCategoryNotFoundException
+import com.teamhide.kream.product.application.exception.ProductNotFoundException
+import com.teamhide.kream.product.domain.model.BiddingType
 import com.teamhide.kream.product.domain.model.InvalidReleasePriceException
+import com.teamhide.kream.product.domain.repository.BiddingRepository
 import com.teamhide.kream.product.domain.repository.ProductBrandRepository
 import com.teamhide.kream.product.domain.repository.ProductCategoryRepository
 import com.teamhide.kream.product.domain.repository.ProductDisplayRepository
 import com.teamhide.kream.product.domain.repository.ProductRepository
+import com.teamhide.kream.product.makeBidding
+import com.teamhide.kream.product.makeProduct
 import com.teamhide.kream.product.makeProductBrand
 import com.teamhide.kream.product.makeProductCategory
 import com.teamhide.kream.product.makeProductDisplay
@@ -30,12 +35,14 @@ class ProductV1ControllerTest(
     private val productBrandRepository: ProductBrandRepository,
     private val productCategoryRepository: ProductCategoryRepository,
     private val productRepository: ProductRepository,
+    private val biddingRepository: BiddingRepository,
 ) : BehaviorSpec({
     afterEach {
         productDisplayRepository.deleteAll()
         productBrandRepository.deleteAll()
         productCategoryRepository.deleteAll()
         productRepository.deleteAll()
+        biddingRepository.deleteAll()
     }
 
     Given("page와 size를 통해") {
@@ -180,6 +187,84 @@ class ProductV1ControllerTest(
                     .jsonPath("category").isEqualTo(productCategory.name)
 
                 productRepository.count() shouldBe 1
+            }
+        }
+    }
+
+    Given("없는 상품을 대상으로") {
+        val productId = 1L
+        val exc = ProductNotFoundException()
+
+        When("상세 정보 조회를 요청하면") {
+            val response = webTestClient.get()
+                .uri("$URL/$productId")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $USER_ID_1_TOKEN")
+                .exchange()
+
+            Then("404가 리턴된다") {
+                response.expectStatus().isNotFound
+                    .expectBody()
+                    .jsonPath("errorCode").isEqualTo(exc.errorCode)
+                    .jsonPath("message").isEqualTo(exc.message)
+            }
+        }
+    }
+
+    Given("입찰 정보가 없는 상품에 대해") {
+        val category = productCategoryRepository.save(makeProductCategory())
+        val brand = productBrandRepository.save(makeProductBrand())
+        val product = productRepository.save(makeProduct(productCategoryId = category.id, productBrandId = brand.id))
+
+        When("상세 정보 조회를 요청하면") {
+            val response = webTestClient.get()
+                .uri("$URL/${product.id}")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $USER_ID_1_TOKEN")
+                .exchange()
+
+            Then("입찰 가격을 제외한 정보를 채워서 리턴한다") {
+                response.expectStatus().isOk
+                    .expectBody()
+                    .jsonPath("productId").isEqualTo(product.id)
+                    .jsonPath("releasePrice").isEqualTo(product.releasePrice)
+                    .jsonPath("modelNumber").isEqualTo(product.modelNumber)
+                    .jsonPath("name").isEqualTo(product.name)
+                    .jsonPath("brand").isEqualTo(brand.name)
+                    .jsonPath("category").isEqualTo(category.name)
+                    .jsonPath("purchaseBidPrice").isEmpty
+                    .jsonPath("saleBidPrice").isEmpty
+            }
+        }
+    }
+
+    Given("입찰 정보가 존재하는 상품에 대해") {
+        val category = productCategoryRepository.save(makeProductCategory())
+        val brand = productBrandRepository.save(makeProductBrand())
+        val product = productRepository.save(makeProduct(productCategoryId = category.id, productBrandId = brand.id))
+
+        val mostExpensiveBidding = biddingRepository.save(makeBidding(price = 20000, productId = product.id, biddingType = BiddingType.PURCHASE))
+
+        val mostCheapestBidding = biddingRepository.save(makeBidding(price = 1000, productId = product.id, biddingType = BiddingType.SALE))
+
+        When("상세 정보 조회를 요청하면") {
+            val response = webTestClient.get()
+                .uri("$URL/${product.id}")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $USER_ID_1_TOKEN")
+                .exchange()
+
+            Then("모든 정보를 채워서 리턴한다") {
+                response.expectStatus().isOk
+                    .expectBody()
+                    .jsonPath("productId").isEqualTo(product.id)
+                    .jsonPath("releasePrice").isEqualTo(product.releasePrice)
+                    .jsonPath("modelNumber").isEqualTo(product.modelNumber)
+                    .jsonPath("name").isEqualTo(product.name)
+                    .jsonPath("brand").isEqualTo(brand.name)
+                    .jsonPath("category").isEqualTo(category.name)
+                    .jsonPath("purchaseBidPrice").isEqualTo(mostCheapestBidding.price)
+                    .jsonPath("saleBidPrice").isEqualTo(mostExpensiveBidding.price)
             }
         }
     }

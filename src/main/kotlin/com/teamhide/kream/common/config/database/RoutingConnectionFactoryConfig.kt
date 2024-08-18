@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing
+import org.springframework.data.r2dbc.core.R2dbcEntityOperations
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 import org.springframework.r2dbc.connection.R2dbcTransactionManager
 import org.springframework.r2dbc.connection.TransactionAwareConnectionFactoryProxy
@@ -43,6 +45,11 @@ class RoutingConnectionFactoryConfig(
     @Bean
     fun reactiveTransactionManager(connectionFactory: ConnectionFactory): ReactiveTransactionManager {
         return R2dbcTransactionManager(TransactionAwareConnectionFactoryProxy(connectionFactory))
+    }
+
+    @Bean
+    fun r2dbcEntityOperations(connectionFactory: ConnectionFactory): R2dbcEntityOperations {
+        return R2dbcEntityTemplate(connectionFactory)
     }
 
     private fun createConnectionFactory(property: ConnectionFactoryProperties.ConnectionFactoryProperty): ConnectionFactory {
