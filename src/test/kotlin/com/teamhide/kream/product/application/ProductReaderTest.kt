@@ -1,0 +1,105 @@
+package com.teamhide.kream.product.application
+
+import com.teamhide.kream.product.domain.repository.ProductBrandRepository
+import com.teamhide.kream.product.domain.repository.ProductCategoryRepository
+import com.teamhide.kream.product.domain.repository.ProductRepository
+import com.teamhide.kream.product.makeProduct
+import com.teamhide.kream.product.makeProductBrand
+import com.teamhide.kream.product.makeProductCategory
+import com.teamhide.kream.product.makeProductInfoDto
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.mockk
+
+class ProductReaderTest : StringSpec({
+    val productRepository = mockk<ProductRepository>()
+    val productCategoryRepository = mockk<ProductCategoryRepository>()
+    val productBrandRepository = mockk<ProductBrandRepository>()
+    val productReader = ProductReader(
+        productRepository = productRepository,
+        productBrandRepository = productBrandRepository,
+        productCategoryRepository = productCategoryRepository,
+    )
+
+    "id로 Product를 조회한다" {
+        // Given
+        val id = 1L
+        val product = makeProduct()
+        coEvery { productRepository.findById(id) } returns product
+
+        // When
+        val sut = productReader.findById(id)
+
+        // Then
+        sut.shouldNotBeNull()
+        sut.id shouldBe product.id
+        sut.name shouldBe product.name
+        sut.productCategoryId shouldBe product.productCategoryId
+        sut.productBrandId shouldBe product.productBrandId
+        sut.releasePrice shouldBe product.releasePrice
+        sut.modelNumber shouldBe product.modelNumber
+        sut.sizeType shouldBe product.sizeType
+    }
+
+    "id로 ProductCategory를 조회한다" {
+        // Given
+        val id = 1L
+        val productCategory = makeProductCategory()
+        coEvery { productReader.findCategoryById(id) } returns productCategory
+
+        // When
+        val sut = productReader.findCategoryById(id)
+
+        // Then
+        sut.shouldNotBeNull()
+        sut.id shouldBe productCategory.id
+        sut.name shouldBe productCategory.name
+        sut.parentCategoryId shouldBe productCategory.parentCategoryId
+    }
+
+    "id로 ProductBrand를 조회한다" {
+        // Given
+        val id = 1L
+        val productBrand = makeProductBrand()
+        coEvery { productReader.findBrandById(id) } returns productBrand
+
+        // When
+        val sut = productReader.findBrandById(id)
+
+        // Then
+        sut.shouldNotBeNull()
+        sut.id shouldBe productBrand.id
+        sut.name shouldBe productBrand.name
+    }
+
+    "id로 ProductInfo를 조회한다 - 존재하지 않는 경우" {
+        // Given
+        coEvery { productRepository.findInfoById(any()) } returns null
+
+        // When
+        val sut = productReader.findProductInfoById(productId = 1L)
+
+        // Then
+        sut shouldBe null
+    }
+
+    "id로 ProductInfo를 조회한다" {
+        // Given
+        val productDetailDto = makeProductInfoDto()
+        coEvery { productRepository.findInfoById(any()) } returns productDetailDto
+
+        // When
+        val sut = productReader.findProductInfoById(productId = 1L)
+
+        // Then
+        sut.shouldNotBeNull()
+        sut.productId shouldBe productDetailDto.productId
+        sut.releasePrice shouldBe productDetailDto.releasePrice
+        sut.modelNumber shouldBe productDetailDto.modelNumber
+        sut.name shouldBe productDetailDto.name
+        sut.brand shouldBe productDetailDto.brand
+        sut.category shouldBe productDetailDto.category
+    }
+})

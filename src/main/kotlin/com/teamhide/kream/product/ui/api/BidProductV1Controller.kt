@@ -2,8 +2,8 @@ package com.teamhide.kream.product.ui.api
 
 import com.teamhide.kream.common.response.ApiResponse
 import com.teamhide.kream.common.security.CurrentUser
-import com.teamhide.kream.product.application.service.BiddingCommandService
 import com.teamhide.kream.product.domain.usecase.BidCommand
+import com.teamhide.kream.product.domain.usecase.BiddingUseCase
 import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseCommand
 import com.teamhide.kream.product.ui.api.dto.BidRequest
 import com.teamhide.kream.product.ui.api.dto.BidResponse
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/v1/bid")
 class BidProductV1Controller(
-    private val biddingCommandService: BiddingCommandService,
+    private val biddingUseCase: BiddingUseCase,
 ) {
     @PostMapping("")
     suspend fun bid(
@@ -36,7 +36,7 @@ class BidProductV1Controller(
                 userId = currentUser.id,
             )
         }
-        val bidResponseDto = biddingCommandService.bid(command = command)
+        val bidResponseDto = biddingUseCase.bid(command = command)
         val response = BidResponse.from(bidResponseDto)
         return ApiResponse.success(body = response, statusCode = HttpStatus.OK)
     }
@@ -47,7 +47,7 @@ class BidProductV1Controller(
         @RequestBody @Valid body: ImmediatePurchaseRequest
     ): ApiResponse<ImmediatePurchaseResponse> {
         val command = ImmediatePurchaseCommand(biddingId = body.biddingId, userId = currentUser.id)
-        val responseDto = biddingCommandService.immediatePurchase(command = command)
+        val responseDto = biddingUseCase.immediatePurchase(command = command)
         val response = ImmediatePurchaseResponse.from(responseDto)
         return ApiResponse.success(body = response, statusCode = HttpStatus.OK)
     }

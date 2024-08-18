@@ -1,8 +1,8 @@
 package com.teamhide.kream.user.ui.api
 
 import com.teamhide.kream.common.response.ApiResponse
-import com.teamhide.kream.user.application.service.UserCommandService
 import com.teamhide.kream.user.domain.usecase.RegisterUserCommand
+import com.teamhide.kream.user.domain.usecase.RegisterUserUseCase
 import com.teamhide.kream.user.ui.api.dto.RegisterUserRequest
 import com.teamhide.kream.user.ui.api.dto.RegisterUserResponse
 import jakarta.validation.Valid
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/v1/user")
 class UserV1Controller(
-    private val userCommandService: UserCommandService,
+    private val registerUserUseCase: RegisterUserUseCase,
 ) {
     @PostMapping("")
     suspend fun registerUser(@RequestBody @Valid body: RegisterUserRequest): ApiResponse<RegisterUserResponse> {
@@ -29,10 +29,8 @@ class UserV1Controller(
                 detailAddress = detailAddress,
             )
         }
-        val response = userCommandService.register(command = command)
-            .let {
-                RegisterUserResponse(email = it.email, nickname = it.nickname)
-            }
+        val user = registerUserUseCase.register(command = command)
+        val response = RegisterUserResponse.from(user)
         return ApiResponse.success(body = response, statusCode = HttpStatus.OK)
     }
 }

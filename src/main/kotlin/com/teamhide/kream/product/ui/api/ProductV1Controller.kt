@@ -1,10 +1,10 @@
 package com.teamhide.kream.product.ui.api
 
 import com.teamhide.kream.common.response.ApiResponse
-import com.teamhide.kream.product.application.service.ProductCommandService
-import com.teamhide.kream.product.application.service.ProductQueryService
 import com.teamhide.kream.product.domain.usecase.GetAllProductQuery
 import com.teamhide.kream.product.domain.usecase.GetProductDetailQuery
+import com.teamhide.kream.product.domain.usecase.ProductFinderUseCase
+import com.teamhide.kream.product.domain.usecase.RegisterProductUseCase
 import com.teamhide.kream.product.ui.api.dto.GetProductResponse
 import com.teamhide.kream.product.ui.api.dto.GetProductsResponse
 import com.teamhide.kream.product.ui.api.dto.RegisterProductRequest
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/v1/product")
 class ProductV1Controller(
-    private val productQueryService: ProductQueryService,
-    private val productCommandService: ProductCommandService,
+    private val productFinderUseCase: ProductFinderUseCase,
+    private val registerProductUseCase: RegisterProductUseCase,
 ) {
     @GetMapping("")
     suspend fun getProducts(
@@ -31,21 +31,21 @@ class ProductV1Controller(
         @RequestParam("size", defaultValue = "20") size: Int,
     ): ApiResponse<GetProductsResponse> {
         val query = GetAllProductQuery(page = page, size = size)
-        val products = productQueryService.getAllProducts(query = query)
+        val products = productFinderUseCase.getAllProducts(query = query)
         return ApiResponse.success(body = GetProductsResponse(data = products), statusCode = HttpStatus.OK)
     }
 
     @PostMapping("")
     suspend fun registerProduct(@RequestBody @Valid body: RegisterProductRequest): ApiResponse<RegisterProductResponse> {
         val command = body.toCommand()
-        val responseDto = productCommandService.registerProduct(command = command)
+        val responseDto = registerProductUseCase.registerProduct(command = command)
         return ApiResponse.success(body = RegisterProductResponse.from(responseDto), statusCode = HttpStatus.OK)
     }
 
     @GetMapping("/{productId}")
     suspend fun getProductDetail(@PathVariable("productId") productId: Long): ApiResponse<GetProductResponse> {
         val query = GetProductDetailQuery(productId = productId)
-        val productDetail = productQueryService.getDetailById(query = query)
+        val productDetail = productFinderUseCase.getDetailById(query = query)
         val response = GetProductResponse.from(productDetail)
         return ApiResponse.success(body = response, statusCode = HttpStatus.OK)
     }
