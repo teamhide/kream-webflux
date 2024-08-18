@@ -41,7 +41,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoResourceFoundException::class)
-    fun handleNoResourceFoundException(e: NoResourceFoundException): ApiResponse<FailBody> {
+    suspend fun handleNoResourceFoundException(e: NoResourceFoundException): ApiResponse<FailBody> {
         val errorConst = CommonErrorConst.NO_RESOURCE_FOUND_ERROR
         val body = FailBody(errorCode = errorConst.errorCode, message = errorConst.message)
         return ApiResponse.fail(body, errorConst.statusCode)
