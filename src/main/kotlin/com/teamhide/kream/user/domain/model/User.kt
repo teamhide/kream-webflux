@@ -1,7 +1,9 @@
 package com.teamhide.kream.user.domain.model
 
 import com.teamhide.kream.common.config.database.BaseTimestampEntity
+import com.teamhide.kream.user.domain.vo.Address
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
@@ -16,11 +18,8 @@ data class User(
     @Column("password")
     val password: String,
 
-    @Column("base_address")
-    var baseAddress: String,
-
-    @Column("detail_address")
-    var detailAddress: String,
+    @Transient
+    val address: Address,
 
     @Id
     val id: Long = 0L,
@@ -41,8 +40,7 @@ data class User(
                 email = email,
                 nickname = nickname,
                 password = password1,
-                baseAddress = baseAddress,
-                detailAddress = detailAddress,
+                address = Address(base = baseAddress, detail = detailAddress),
             )
         }
     }

@@ -2,6 +2,7 @@ package com.teamhide.kream.user
 
 import com.teamhide.kream.user.domain.model.User
 import com.teamhide.kream.user.domain.usecase.RegisterUserCommand
+import com.teamhide.kream.user.domain.vo.Address
 
 const val EXPIRED_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDE3NTk5MTAsImV4cCI6MTcwMTc1OTk5NywidXNlcl9pZCI6MX0.a3gyosESbCJ_-adDmkPUUa7hrdx2zQe1xebUV252jb8"
 const val USER_ID_1_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.JWd_KhG7M3FTQOlUVujmAEQ9b3a0pU2a74b-3ehboAE"
@@ -20,8 +21,7 @@ fun makeUser(
         email = email,
         nickname = nickname,
         password = password,
-        baseAddress = baseAddress,
-        detailAddress = detailAddress,
+        address = Address(base = baseAddress, detail = detailAddress),
     )
 }
 

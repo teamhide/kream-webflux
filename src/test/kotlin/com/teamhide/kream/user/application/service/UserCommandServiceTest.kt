@@ -50,8 +50,8 @@ class UserCommandServiceTest : BehaviorSpec({
                 sut.nickname shouldBe user.nickname
                 sut.email shouldBe user.email
                 sut.password shouldBe user.password
-                sut.baseAddress shouldBe user.baseAddress
-                sut.detailAddress shouldBe user.detailAddress
+                sut.address.base shouldBe user.address.base
+                sut.address.detail shouldBe user.address.detail
             }
         }
     }

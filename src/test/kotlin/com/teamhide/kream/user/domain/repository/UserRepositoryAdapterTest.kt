@@ -37,8 +37,8 @@ class UserRepositoryAdapterTest : BehaviorSpec({
                 sut.password shouldBe user.password
                 sut.email shouldBe user.email
                 sut.nickname shouldBe user.nickname
-                sut.baseAddress shouldBe user.baseAddress
-                sut.detailAddress shouldBe user.detailAddress
+                sut.address.base shouldBe user.address.base
+                sut.address.detail shouldBe user.address.detail
                 coVerify(exactly = 1) { userRepository.save(any()) }
             }
         }
@@ -56,8 +56,8 @@ class UserRepositoryAdapterTest : BehaviorSpec({
                 sut.id shouldBe user.id
                 sut.password shouldBe user.password
                 sut.email shouldBe user.email
-                sut.baseAddress shouldBe user.baseAddress
-                sut.detailAddress shouldBe user.detailAddress
+                sut.address.base shouldBe user.address.base
+                sut.address.detail shouldBe user.address.detail
             }
         }
     }

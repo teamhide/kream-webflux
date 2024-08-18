@@ -27,7 +27,7 @@ class ProductUserAdapterTest : StringSpec({
         sut.password shouldBe user.password
         sut.email shouldBe user.email
         sut.nickname shouldBe user.nickname
-        sut.baseAddress shouldBe user.baseAddress
-        sut.detailAddress shouldBe user.detailAddress
+        sut.address.base shouldBe user.address.base
+        sut.address.detail shouldBe user.address.detail
     }
 })
