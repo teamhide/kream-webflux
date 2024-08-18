@@ -13,7 +13,9 @@ import com.teamhide.kream.product.domain.model.ProductInfo
 import com.teamhide.kream.product.domain.model.SaleHistory
 import com.teamhide.kream.product.domain.model.SizeType
 import com.teamhide.kream.product.domain.repository.ProductInfoDto
+import com.teamhide.kream.product.domain.usecase.BidCommand
 import com.teamhide.kream.product.domain.usecase.RegisterProductCommand
+import com.teamhide.kream.product.ui.api.dto.BidRequest
 import com.teamhide.kream.product.ui.api.dto.RegisterProductRequest
 
 fun makeProductCategory(
@@ -192,5 +194,35 @@ fun makeProductInfo(
         name = name,
         brand = brand,
         category = category,
+    )
+}
+
+fun makeBidCommand(
+    productId: Long = 1L,
+    price: Int = 1000,
+    size: String = "M",
+    biddingType: BiddingType = BiddingType.PURCHASE,
+    userId: Long = 1L,
+): BidCommand {
+    return BidCommand(
+        productId = productId,
+        price = price,
+        size = size,
+        biddingType = biddingType,
+        userId = userId,
+    )
+}
+
+fun makeBidRequest(
+    productId: Long = 1L,
+    price: Int = 50000,
+    size: String = "M",
+    biddingType: BiddingType = BiddingType.SALE,
+): BidRequest {
+    return BidRequest(
+        productId = productId,
+        price = price,
+        size = size,
+        biddingType = biddingType,
     )
 }

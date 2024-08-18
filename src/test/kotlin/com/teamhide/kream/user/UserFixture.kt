@@ -8,6 +8,7 @@ const val USER_ID_1_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIj
 const val USER_ID_2_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyfQ.0xRiB1wfPN9nuJ_6UtDBJAxhAfuJ_qnUuo_Bgfhjlb0"
 
 fun makeUser(
+    id: Long = 0L,
     email: String = "h@id.e",
     nickname: String = "hide",
     password: String = "password",
@@ -15,6 +16,7 @@ fun makeUser(
     detailAddress: String = "detailAddress",
 ): User {
     return User(
+        id = id,
         email = email,
         nickname = nickname,
         password = password,
