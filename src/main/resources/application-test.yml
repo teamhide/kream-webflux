@@ -43,13 +43,14 @@ spring:
     password: kream
     locations: classpath:db/migration
   kafka:
-    schema:
-      registry:
-        url: localhost:8081
-    bootstrap-servers: localhost:9092
     topic:
       bidding-created: kream.bidding.created
       bidding-completed: kream.bidding.completed
+    producer:
+      bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      bootstrap-servers: localhost:9092
 jwt:
   secret-key: hidehidehidehidehidehidehidehidehide
 logging:

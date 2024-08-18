@@ -16,7 +16,6 @@ import com.teamhide.kream.user.application.exception.UserNotFoundException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
 @Service
@@ -24,7 +23,7 @@ class BiddingCommandService(
     private val biddingRepositoryAdapter: BiddingRepositoryAdapter,
     private val productUserAdapter: ProductUserAdapter,
     private val productRepositoryAdapter: ProductRepositoryAdapter,
-    private val applicationEventPublisher: ApplicationEventPublisher,
+    private val biddingKafkaAdapter: BiddingKafkaAdapter,
 ) : BidUseCase {
     override suspend fun bid(command: BidCommand): BidResponseDto {
         if (!canBid(productId = command.productId, price = command.price, biddingType = command.biddingType)) {
@@ -65,7 +64,7 @@ class BiddingCommandService(
             biddingId = bidding.id,
             price = bidding.price,
         )
-        applicationEventPublisher.publishEvent(event)
+        biddingKafkaAdapter.sendBiddingCreated(event = event)
         return response
     }
 

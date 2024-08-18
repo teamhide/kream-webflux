@@ -21,18 +21,17 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
-import org.springframework.context.ApplicationEventPublisher
 
 class BiddingCommandServiceTest : BehaviorSpec({
     val biddingRepositoryAdapter = mockk<BiddingRepositoryAdapter>()
     val productUserAdapter = mockk<ProductUserAdapter>()
     val productRepositoryAdapter = mockk<ProductRepositoryAdapter>()
-    val applicationEventPublisher = mockk<ApplicationEventPublisher>()
+    val biddingKafkaAdapter = mockk<BiddingKafkaAdapter>()
     val biddingCommandService = BiddingCommandService(
         biddingRepositoryAdapter = biddingRepositoryAdapter,
         productUserAdapter = productUserAdapter,
         productRepositoryAdapter = productRepositoryAdapter,
-        applicationEventPublisher = applicationEventPublisher,
+        biddingKafkaAdapter = biddingKafkaAdapter,
     )
 
     Given("동일한 가격의 구매 입찰이 있을 때") {
@@ -166,7 +165,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
         val bidding = makeBidding(price = biddingPrice, biddingType = biddingType)
         coEvery { biddingRepositoryAdapter.save(any()) } returns bidding
 
-        coEvery { applicationEventPublisher.publishEvent(any<BiddingCreatedEvent>()) } just Runs
+        coEvery { biddingKafkaAdapter.sendBiddingCreated(any<BiddingCreatedEvent>()) } just Runs
 
         val command = makeBidCommand(price = biddingPrice, biddingType = biddingType)
 
@@ -184,7 +183,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
             }
 
             Then("입찰 생성 이벤트를 발행한다") {
-                coVerify(exactly = 1) { applicationEventPublisher.publishEvent(any<BiddingCreatedEvent>()) }
+                coVerify(exactly = 1) { biddingKafkaAdapter.sendBiddingCreated(any<BiddingCreatedEvent>()) }
             }
         }
     }
