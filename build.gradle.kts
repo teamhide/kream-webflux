@@ -28,6 +28,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.kafka:spring-kafka")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -40,6 +42,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-mysql")
     implementation("com.mysql:mysql-connector-j")
+    implementation("io.projectreactor.kafka:reactor-kafka")
 
     runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.112.Final:osx-aarch_64")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
