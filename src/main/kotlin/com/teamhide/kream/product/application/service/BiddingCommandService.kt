@@ -1,16 +1,26 @@
 package com.teamhide.kream.product.application.service
 
+import com.teamhide.kream.product.application.exception.AlreadyCompleteBidException
+import com.teamhide.kream.product.application.exception.BiddingNotFoundException
 import com.teamhide.kream.product.application.exception.ImmediateTradeAvailableException
 import com.teamhide.kream.product.application.exception.ProductNotFoundException
+import com.teamhide.kream.product.domain.event.BiddingCompletedEvent
 import com.teamhide.kream.product.domain.event.BiddingCreatedEvent
 import com.teamhide.kream.product.domain.model.Bidding
 import com.teamhide.kream.product.domain.model.BiddingStatus
 import com.teamhide.kream.product.domain.model.BiddingType
 import com.teamhide.kream.product.domain.repository.BiddingRepositoryAdapter
 import com.teamhide.kream.product.domain.repository.ProductRepositoryAdapter
+import com.teamhide.kream.product.domain.usecase.AttemptPaymentCommand
+import com.teamhide.kream.product.domain.usecase.AttemptPaymentUseCase
 import com.teamhide.kream.product.domain.usecase.BidCommand
 import com.teamhide.kream.product.domain.usecase.BidResponseDto
 import com.teamhide.kream.product.domain.usecase.BidUseCase
+import com.teamhide.kream.product.domain.usecase.CompleteBidCommand
+import com.teamhide.kream.product.domain.usecase.CompleteBidUseCase
+import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseCommand
+import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseResponseDto
+import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseUseCase
 import com.teamhide.kream.product.domain.usecase.ProductUserAdapter
 import com.teamhide.kream.user.application.exception.UserNotFoundException
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +34,9 @@ class BiddingCommandService(
     private val productUserAdapter: ProductUserAdapter,
     private val productRepositoryAdapter: ProductRepositoryAdapter,
     private val biddingKafkaAdapter: BiddingKafkaAdapter,
-) : BidUseCase {
+    private val attemptPaymentUseCase: AttemptPaymentUseCase,
+    private val completeBidUseCase: CompleteBidUseCase,
+) : BidUseCase, ImmediatePurchaseUseCase {
     override suspend fun bid(command: BidCommand): BidResponseDto {
         if (!canBid(productId = command.productId, price = command.price, biddingType = command.biddingType)) {
             throw ImmediateTradeAvailableException()
@@ -89,5 +101,30 @@ class BiddingCommandService(
                 productId = productId, biddingType = BiddingType.SALE
             )
         }
+    }
+
+    override suspend fun immediatePurchase(command: ImmediatePurchaseCommand): ImmediatePurchaseResponseDto {
+        val bidding =
+            biddingRepositoryAdapter.findById(biddingId = command.biddingId) ?: throw BiddingNotFoundException()
+        if (!bidding.canBid()) {
+            throw AlreadyCompleteBidException()
+        }
+
+        val user =
+            productUserAdapter.findById(userId = command.userId) ?: throw UserNotFoundException()
+
+        val purchaserId = user.id
+        val paymentId = AttemptPaymentCommand(biddingId = bidding.id, price = bidding.price, userId = purchaserId).let {
+            attemptPaymentUseCase.attemptPayment(command = it)
+        }
+
+        CompleteBidCommand(paymentId = paymentId, biddingId = bidding.id, userId = purchaserId).let {
+            completeBidUseCase.complete(command = it)
+        }
+
+        val event = BiddingCompletedEvent(productId = command.biddingId, biddingId = bidding.id)
+        biddingKafkaAdapter.sendBiddingCompleted(event = event)
+
+        return ImmediatePurchaseResponseDto(biddingId = bidding.id, price = bidding.price)
     }
 }

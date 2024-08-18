@@ -14,6 +14,7 @@ import com.teamhide.kream.product.domain.model.SaleHistory
 import com.teamhide.kream.product.domain.model.SizeType
 import com.teamhide.kream.product.domain.repository.ProductInfoDto
 import com.teamhide.kream.product.domain.usecase.BidCommand
+import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseCommand
 import com.teamhide.kream.product.domain.usecase.RegisterProductCommand
 import com.teamhide.kream.product.domain.usecase.SaveOrUpdateProductDisplayCommand
 import com.teamhide.kream.product.ui.api.dto.BidRequest
@@ -237,5 +238,15 @@ fun makeSaveOrUpdateProductDisplayCommand(
         productId = productId,
         price = price,
         biddingId = biddingId,
+    )
+}
+
+fun makeImmediatePurchaseCommand(
+    biddingId: Long = 1L,
+    userId: Long = 1L,
+): ImmediatePurchaseCommand {
+    return ImmediatePurchaseCommand(
+        biddingId = biddingId,
+        userId = userId,
     )
 }

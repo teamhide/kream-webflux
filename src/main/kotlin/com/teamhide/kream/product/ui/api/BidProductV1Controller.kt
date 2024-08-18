@@ -4,8 +4,11 @@ import com.teamhide.kream.common.response.ApiResponse
 import com.teamhide.kream.common.security.CurrentUser
 import com.teamhide.kream.product.application.service.BiddingCommandService
 import com.teamhide.kream.product.domain.usecase.BidCommand
+import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseCommand
 import com.teamhide.kream.product.ui.api.dto.BidRequest
 import com.teamhide.kream.product.ui.api.dto.BidResponse
+import com.teamhide.kream.product.ui.api.dto.ImmediatePurchaseRequest
+import com.teamhide.kream.product.ui.api.dto.ImmediatePurchaseResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -35,6 +38,17 @@ class BidProductV1Controller(
         }
         val bidResponseDto = biddingCommandService.bid(command = command)
         val response = BidResponse.from(bidResponseDto)
+        return ApiResponse.success(body = response, statusCode = HttpStatus.OK)
+    }
+
+    @PostMapping("/purchase")
+    suspend fun immediatePurchase(
+        @AuthenticationPrincipal currentUser: CurrentUser,
+        @RequestBody @Valid body: ImmediatePurchaseRequest
+    ): ApiResponse<ImmediatePurchaseResponse> {
+        val command = ImmediatePurchaseCommand(biddingId = body.biddingId, userId = currentUser.id)
+        val responseDto = biddingCommandService.immediatePurchase(command = command)
+        val response = ImmediatePurchaseResponse.from(responseDto)
         return ApiResponse.success(body = response, statusCode = HttpStatus.OK)
     }
 }
