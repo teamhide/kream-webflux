@@ -14,6 +14,7 @@ import com.teamhide.kream.product.domain.model.SaleHistory
 import com.teamhide.kream.product.domain.model.SizeType
 import com.teamhide.kream.product.domain.repository.ProductInfoDto
 import com.teamhide.kream.product.domain.usecase.BidCommand
+import com.teamhide.kream.product.domain.usecase.CompleteBidCommand
 import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseCommand
 import com.teamhide.kream.product.domain.usecase.RegisterProductCommand
 import com.teamhide.kream.product.domain.usecase.SaveOrUpdateProductDisplayCommand
@@ -151,20 +152,6 @@ fun makeBidding(
     )
 }
 
-fun makeSaleHistory(
-    biddingId: Long = 1L,
-    userId: Long = 1L,
-    price: Int = 20000,
-    size: String = "M"
-): SaleHistory {
-    return SaleHistory(
-        biddingId = biddingId,
-        userId = userId,
-        price = price,
-        size = size,
-    )
-}
-
 fun makeOrder(
     id: Long = 0L,
     paymentId: String = "paymentId",
@@ -248,5 +235,31 @@ fun makeImmediatePurchaseCommand(
     return ImmediatePurchaseCommand(
         biddingId = biddingId,
         userId = userId,
+    )
+}
+
+fun makeCompleteBidCommand(
+    paymentId: String = "paymentId",
+    biddingId: Long = 1L,
+    userId: Long = 1L,
+): CompleteBidCommand {
+    return CompleteBidCommand(
+        paymentId = paymentId,
+        biddingId = biddingId,
+        userId = userId,
+    )
+}
+
+fun makeSaleHistory(
+    biddingId: Long = 0L,
+    userId: Long = 0L,
+    price: Int = 20000,
+    size: String = "M"
+): SaleHistory {
+    return SaleHistory(
+        biddingId = biddingId,
+        userId = userId,
+        price = price,
+        size = size,
     )
 }
