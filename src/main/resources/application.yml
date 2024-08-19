@@ -68,3 +68,5 @@ logging:
 client:
   pg:
     url: http://localhost:8080
+    connect-timeout-milliseconds: 1000
+    read-timeout-milliseconds: 1000

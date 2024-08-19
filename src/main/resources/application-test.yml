@@ -61,7 +61,3 @@ logging:
     kafka.*: OFF
     org.apache.zookeeper.*: OFF
     org.springframework.r2dbc.*: DEBUG
-
-client:
-  pg:
-    url: http://localhost:8080

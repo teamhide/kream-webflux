@@ -274,7 +274,6 @@ class BiddingCommandServiceTest : BehaviorSpec({
 
         val paymentId = "paymentId"
         coEvery { attemptPaymentUseCase.attemptPayment(any()) } returns paymentId
-//        coEvery { pgClient.attemptPayment(any()) } returns AttemptPaymentResponse(paymentId = paymentId)
 
         coEvery { completeBidUseCase.complete(any()) } just Runs
 
