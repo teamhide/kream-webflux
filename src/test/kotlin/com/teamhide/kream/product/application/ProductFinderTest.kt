@@ -5,7 +5,6 @@ import com.teamhide.kream.product.domain.model.BiddingType
 import com.teamhide.kream.product.domain.usecase.BiddingReaderUseCase
 import com.teamhide.kream.product.domain.usecase.GetAllProductQuery
 import com.teamhide.kream.product.domain.usecase.GetProductDetailQuery
-import com.teamhide.kream.product.domain.usecase.ProductDisplayReaderUseCase
 import com.teamhide.kream.product.domain.usecase.ProductReaderUseCase
 import com.teamhide.kream.product.makeBidding
 import com.teamhide.kream.product.makeProductDisplay
@@ -18,11 +17,9 @@ import io.mockk.coEvery
 import io.mockk.mockk
 
 class ProductFinderTest : BehaviorSpec({
-    val productDisplayReaderUseCase = mockk<ProductDisplayReaderUseCase>()
     val biddingReaderUseCase = mockk<BiddingReaderUseCase>()
     val productReaderUseCase = mockk<ProductReaderUseCase>()
     val productFinder = ProductFinder(
-        productDisplayReaderUseCase = productDisplayReaderUseCase,
         biddingReaderUseCase = biddingReaderUseCase,
         productReaderUseCase = productReaderUseCase,
     )
@@ -31,7 +28,7 @@ class ProductFinderTest : BehaviorSpec({
         val query = GetAllProductQuery(page = 0, size = 20)
         val productDisplay1 = makeProductDisplay(productId = 1L)
         val productDisplay2 = makeProductDisplay(productId = 2L)
-        coEvery { productDisplayReaderUseCase.findAllBy(any(), any()) } returns listOf(productDisplay1, productDisplay2)
+        coEvery { productReaderUseCase.findDisplayAllBy(any(), any()) } returns listOf(productDisplay1, productDisplay2)
 
         When("상품 전시 목록을 요청하면") {
             val sut = productFinder.getAllProducts(query = query)

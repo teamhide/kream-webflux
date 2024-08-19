@@ -3,7 +3,6 @@ package com.teamhide.kream.product.application
 import com.teamhide.kream.product.domain.model.ProductDisplay
 import com.teamhide.kream.product.domain.repository.ProductDisplayRepository
 import com.teamhide.kream.product.domain.repository.ProductRepository
-import com.teamhide.kream.product.domain.usecase.ProductDisplayReaderUseCase
 import com.teamhide.kream.product.domain.usecase.ProductReaderUseCase
 import com.teamhide.kream.product.domain.usecase.SaveOrUpdateProductDisplayCommand
 import com.teamhide.kream.product.domain.usecase.SaveOrUpdateProductDisplayUseCase
@@ -16,12 +15,11 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class SaveOrUpdateProductDisplayService(
     private val productReaderUseCase: ProductReaderUseCase,
-    private val productDisplayReaderUseCase: ProductDisplayReaderUseCase,
     private val productRepository: ProductRepository,
     private val productDisplayRepository: ProductDisplayRepository,
 ) : SaveOrUpdateProductDisplayUseCase {
     override suspend fun execute(command: SaveOrUpdateProductDisplayCommand) {
-        val existingProductDisplay = productDisplayReaderUseCase.findByProductId(productId = command.productId)
+        val existingProductDisplay = productReaderUseCase.findDisplayByProductId(productId = command.productId)
 
         if (existingProductDisplay == null) {
             handleNewProductDisplay(command = command)
@@ -31,7 +29,7 @@ class SaveOrUpdateProductDisplayService(
     }
 
     private suspend fun handleNewProductDisplay(command: SaveOrUpdateProductDisplayCommand) = coroutineScope {
-        val product = productReaderUseCase.findById(productId = command.productId) ?: return@coroutineScope
+        val product = productReaderUseCase.findProductById(productId = command.productId) ?: return@coroutineScope
 
         val brand = async {
             productReaderUseCase.findBrandById(brandId = product.productBrandId)

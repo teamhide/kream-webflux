@@ -7,7 +7,6 @@ import com.teamhide.kream.product.domain.model.ProductDisplayRead
 import com.teamhide.kream.product.domain.usecase.BiddingReaderUseCase
 import com.teamhide.kream.product.domain.usecase.GetAllProductQuery
 import com.teamhide.kream.product.domain.usecase.GetProductDetailQuery
-import com.teamhide.kream.product.domain.usecase.ProductDisplayReaderUseCase
 import com.teamhide.kream.product.domain.usecase.ProductFinderUseCase
 import com.teamhide.kream.product.domain.usecase.ProductReaderUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -17,12 +16,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class ProductFinder(
-    private val productDisplayReaderUseCase: ProductDisplayReaderUseCase,
     private val biddingReaderUseCase: BiddingReaderUseCase,
     private val productReaderUseCase: ProductReaderUseCase,
 ) : ProductFinderUseCase {
     override suspend fun getAllProducts(query: GetAllProductQuery): List<ProductDisplayRead> {
-        return productDisplayReaderUseCase.findAllBy(page = query.page, size = query.size)
+        return productReaderUseCase.findDisplayAllBy(page = query.page, size = query.size)
             .map {
                 ProductDisplayRead(
                     productId = it.productId,

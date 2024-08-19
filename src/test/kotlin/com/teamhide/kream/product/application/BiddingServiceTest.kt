@@ -34,7 +34,7 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 
-class BiddingCommandServiceTest : BehaviorSpec({
+class BiddingServiceTest : BehaviorSpec({
     isolationMode = IsolationMode.InstancePerLeaf
 
     val biddingReaderUseCase = mockk<BiddingReaderUseCase>()
@@ -46,7 +46,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
     val completeBidUseCase = mockk<CompleteBidUseCase>()
     val outboxRepository = mockk<OutboxRepository>()
     val objectMapper = ObjectMapper().registerKotlinModule()
-    val biddingCommandService = BiddingCommandService(
+    val biddingService = BiddingService(
         biddingReaderUseCase = biddingReaderUseCase,
         biddingRepository = biddingRepository,
         productUserAdapter = productUserAdapter,
@@ -68,7 +68,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
         When("판매 입찰을 시도하면") {
             Then("예외가 발생한다") {
                 shouldThrow<ImmediateTradeAvailableException> {
-                    biddingCommandService.bid(command = command)
+                    biddingService.bid(command = command)
                 }
             }
         }
@@ -84,7 +84,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
         When("판매 입찰을 시도하면") {
             Then("예외가 발생한다") {
                 shouldThrow<ImmediateTradeAvailableException> {
-                    biddingCommandService.bid(command = command)
+                    biddingService.bid(command = command)
                 }
             }
         }
@@ -100,7 +100,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
         When("판매 입찰을 시도하면") {
             Then("예외가 발생한다") {
                 shouldThrow<ImmediateTradeAvailableException> {
-                    biddingCommandService.bid(command = command)
+                    biddingService.bid(command = command)
                 }
             }
         }
@@ -116,7 +116,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
         When("판매 입찰을 시도하면") {
             Then("예외가 발생한다") {
                 shouldThrow<ImmediateTradeAvailableException> {
-                    biddingCommandService.bid(command = command)
+                    biddingService.bid(command = command)
                 }
             }
         }
@@ -132,7 +132,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
 
         When("구매 입찰을 시도하면") {
             Then("예외가 발생한다") {
-                shouldThrow<UserNotFoundException> { biddingCommandService.bid(command = command) }
+                shouldThrow<UserNotFoundException> { biddingService.bid(command = command) }
             }
         }
     }
@@ -144,13 +144,13 @@ class BiddingCommandServiceTest : BehaviorSpec({
         val user = makeUser()
         coEvery { productUserAdapter.findById(any()) } returns user
 
-        coEvery { productReaderUseCase.findById(any()) } returns null
+        coEvery { productReaderUseCase.findProductById(any()) } returns null
 
         val command = makeBidCommand(price = 1000, biddingType = BiddingType.PURCHASE)
 
         When("구매 입찰을 시도하면") {
             Then("예외가 발생한다") {
-                shouldThrow<ProductNotFoundException> { biddingCommandService.bid(command = command) }
+                shouldThrow<ProductNotFoundException> { biddingService.bid(command = command) }
             }
         }
     }
@@ -163,13 +163,13 @@ class BiddingCommandServiceTest : BehaviorSpec({
         coEvery { productUserAdapter.findById(any()) } returns user
 
         val product = makeProduct()
-        coEvery { productReaderUseCase.findById(any()) } returns product
+        coEvery { productReaderUseCase.findProductById(any()) } returns product
 
         val command = makeBidCommand(price = 0, biddingType = BiddingType.PURCHASE)
 
         When("구매 입찰을 시도하면") {
             Then("예외가 발생한다") {
-                shouldThrow<InvalidBiddingPriceException> { biddingCommandService.bid(command = command) }
+                shouldThrow<InvalidBiddingPriceException> { biddingService.bid(command = command) }
             }
         }
     }
@@ -182,7 +182,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
         coEvery { productUserAdapter.findById(any()) } returns user
 
         val product = makeProduct()
-        coEvery { productReaderUseCase.findById(any()) } returns product
+        coEvery { productReaderUseCase.findProductById(any()) } returns product
 
         val biddingPrice = 1000
         val biddingType = BiddingType.PURCHASE
@@ -194,7 +194,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
         val command = makeBidCommand(price = biddingPrice, biddingType = biddingType)
 
         When("구매 입찰을 시도하면") {
-            val sut = biddingCommandService.bid(command = command)
+            val sut = biddingService.bid(command = command)
 
             Then("성공한다") {
                 sut.biddingId shouldBe bidding.id
@@ -219,7 +219,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
 
         When("즉시 구매 요청을 하면") {
             Then("예외가 발생한다") {
-                shouldThrow<BiddingNotFoundException> { biddingCommandService.immediatePurchase(command = command) }
+                shouldThrow<BiddingNotFoundException> { biddingService.immediatePurchase(command = command) }
             }
         }
     }
@@ -232,7 +232,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
 
         When("즉시 구매 요청을 하면") {
             Then("예외가 발생한다") {
-                shouldThrow<AlreadyCompleteBidException> { biddingCommandService.immediatePurchase(command = command) }
+                shouldThrow<AlreadyCompleteBidException> { biddingService.immediatePurchase(command = command) }
             }
         }
     }
@@ -247,7 +247,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
 
         When("즉시 구매 요청을 하면") {
             Then("예외가 발생한다") {
-                shouldThrow<UserNotFoundException> { biddingCommandService.immediatePurchase(command = command) }
+                shouldThrow<UserNotFoundException> { biddingService.immediatePurchase(command = command) }
             }
         }
     }
@@ -285,7 +285,7 @@ class BiddingCommandServiceTest : BehaviorSpec({
         )
 
         When("즉시 구매 - 즉시 구매 요청을 하면") {
-            val sut = biddingCommandService.immediatePurchase(command = command)
+            val sut = biddingService.immediatePurchase(command = command)
 
             Then("구매 정보가 리턴된다") {
                 sut.biddingId shouldBe bidding.id

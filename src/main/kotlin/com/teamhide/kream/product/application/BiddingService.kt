@@ -32,7 +32,7 @@ import kotlinx.coroutines.async
 import org.springframework.stereotype.Service
 
 @Service
-class BiddingCommandService(
+class BiddingService(
     private val biddingReaderUseCase: BiddingReaderUseCase,
     private val biddingRepository: BiddingRepository,
     private val productUserAdapter: ProductUserAdapter,
@@ -53,7 +53,7 @@ class BiddingCommandService(
                 ?: throw UserNotFoundException()
         }
         val productDeferred = CoroutineScope(Dispatchers.IO).async {
-            productReaderUseCase.findById(productId = command.productId)
+            productReaderUseCase.findProductById(productId = command.productId)
                 ?: throw ProductNotFoundException()
         }
         val user = userDeferred.await()
