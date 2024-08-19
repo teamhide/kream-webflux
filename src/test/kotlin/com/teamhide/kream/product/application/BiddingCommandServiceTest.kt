@@ -1,10 +1,14 @@
 package com.teamhide.kream.product.application
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.teamhide.kream.outbox.AggregateType
+import com.teamhide.kream.outbox.Outbox
+import com.teamhide.kream.outbox.OutboxRepository
 import com.teamhide.kream.product.application.exception.AlreadyCompleteBidException
 import com.teamhide.kream.product.application.exception.BiddingNotFoundException
 import com.teamhide.kream.product.application.exception.ImmediateTradeAvailableException
 import com.teamhide.kream.product.application.exception.ProductNotFoundException
-import com.teamhide.kream.product.domain.event.BiddingCompletedEvent
 import com.teamhide.kream.product.domain.event.BiddingCreatedEvent
 import com.teamhide.kream.product.domain.model.BiddingStatus
 import com.teamhide.kream.product.domain.model.BiddingType
@@ -40,6 +44,8 @@ class BiddingCommandServiceTest : BehaviorSpec({
     val biddingKafkaAdapter = mockk<BiddingKafkaAdapter>()
     val attemptPaymentUseCase = mockk<AttemptPaymentUseCase>()
     val completeBidUseCase = mockk<CompleteBidUseCase>()
+    val outboxRepository = mockk<OutboxRepository>()
+    val objectMapper = ObjectMapper().registerKotlinModule()
     val biddingCommandService = BiddingCommandService(
         biddingReaderUseCase = biddingReaderUseCase,
         biddingRepository = biddingRepository,
@@ -48,6 +54,8 @@ class BiddingCommandServiceTest : BehaviorSpec({
         biddingKafkaAdapter = biddingKafkaAdapter,
         attemptPaymentUseCase = attemptPaymentUseCase,
         completeBidUseCase = completeBidUseCase,
+        outboxRepository = outboxRepository,
+        objectMapper = objectMapper,
     )
 
     Given("일반 입찰 - 동일한 가격의 구매 입찰이 있을 때") {
@@ -272,6 +280,11 @@ class BiddingCommandServiceTest : BehaviorSpec({
 
         coEvery { biddingKafkaAdapter.sendBiddingCompleted(any()) } just Runs
 
+        coEvery { outboxRepository.save(any()) } returns Outbox(
+            aggregateType = AggregateType.BIDDING_COMPLETED,
+            payload = "",
+        )
+
         When("즉시 구매 - 즉시 구매 요청을 하면") {
             val sut = biddingCommandService.immediatePurchase(command = command)
 
@@ -288,8 +301,8 @@ class BiddingCommandServiceTest : BehaviorSpec({
                 coVerify(exactly = 1) { completeBidUseCase.complete(any()) }
             }
 
-            Then("입찰 종료 이벤트를 보낸다") {
-                coVerify(exactly = 1) { biddingKafkaAdapter.sendBiddingCompleted(any<BiddingCompletedEvent>()) }
+            Then("아웃박스 테이블에 이벤트를 저장한다") {
+                coVerify(exactly = 1) { outboxRepository.save(any()) }
             }
         }
     }

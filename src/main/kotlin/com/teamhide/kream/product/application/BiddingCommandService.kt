@@ -1,5 +1,9 @@
 package com.teamhide.kream.product.application
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.teamhide.kream.outbox.AggregateType
+import com.teamhide.kream.outbox.Outbox
+import com.teamhide.kream.outbox.OutboxRepository
 import com.teamhide.kream.product.application.exception.AlreadyCompleteBidException
 import com.teamhide.kream.product.application.exception.BiddingNotFoundException
 import com.teamhide.kream.product.application.exception.ImmediateTradeAvailableException
@@ -36,6 +40,8 @@ class BiddingCommandService(
     private val biddingKafkaAdapter: BiddingKafkaAdapter,
     private val attemptPaymentUseCase: AttemptPaymentUseCase,
     private val completeBidUseCase: CompleteBidUseCase,
+    private val outboxRepository: OutboxRepository,
+    private val objectMapper: ObjectMapper,
 ) : BiddingUseCase {
     override suspend fun bid(command: BidCommand): BidResponseDto {
         if (!canBid(productId = command.productId, price = command.price, biddingType = command.biddingType)) {
@@ -114,17 +120,23 @@ class BiddingCommandService(
             productUserAdapter.findById(userId = command.userId) ?: throw UserNotFoundException()
 
         val purchaserId = user.id
-        val paymentId = AttemptPaymentCommand(biddingId = bidding.id, price = bidding.price, userId = purchaserId).let {
-            attemptPaymentUseCase.attemptPayment(command = it)
-        }
+        val attemptPaymentCommand = AttemptPaymentCommand(biddingId = bidding.id, price = bidding.price, userId = purchaserId)
+        val paymentId = attemptPaymentUseCase.attemptPayment(command = attemptPaymentCommand)
 
-        CompleteBidCommand(paymentId = paymentId, biddingId = bidding.id, userId = purchaserId).let {
-            completeBidUseCase.complete(command = it)
-        }
+        val completeBidCommand = CompleteBidCommand(paymentId = paymentId, biddingId = bidding.id, userId = purchaserId)
+        completeBidUseCase.complete(command = completeBidCommand)
 
-        val event = BiddingCompletedEvent(productId = command.biddingId, biddingId = bidding.id)
-        biddingKafkaAdapter.sendBiddingCompleted(event = event)
+        saveToOutbox(productId = command.biddingId, biddingId = bidding.id)
 
         return ImmediatePurchaseResponseDto(biddingId = bidding.id, price = bidding.price)
+    }
+
+    private suspend fun saveToOutbox(productId: Long, biddingId: Long) {
+        val event = BiddingCompletedEvent(productId = productId, biddingId = biddingId)
+        val outbox = Outbox(
+            aggregateType = AggregateType.BIDDING_COMPLETED,
+            payload = objectMapper.writeValueAsString(event),
+        )
+        outboxRepository.save(outbox)
     }
 }
