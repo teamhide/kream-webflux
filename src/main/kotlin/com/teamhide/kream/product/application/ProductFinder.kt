@@ -12,6 +12,7 @@ import com.teamhide.kream.product.domain.usecase.ProductReaderUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Service
 
 @Service
@@ -32,7 +33,7 @@ class ProductFinder(
             }
     }
 
-    override suspend fun getDetailById(query: GetProductDetailQuery): ProductDetail {
+    override suspend fun getDetailById(query: GetProductDetailQuery): ProductDetail = coroutineScope {
         val product = productReaderUseCase.findProductInfoById(productId = query.productId)
             ?: throw ProductNotFoundException()
 
@@ -51,7 +52,7 @@ class ProductFinder(
         val expensiveBidding = expensiveBiddingDeferred.await()
         val cheapestBidding = cheapestBiddingDeferred.await()
 
-        return ProductDetail(
+        ProductDetail(
             productId = product.productId,
             releasePrice = product.releasePrice,
             modelNumber = product.modelNumber,

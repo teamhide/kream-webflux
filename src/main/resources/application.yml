@@ -35,6 +35,8 @@ spring:
     redis:
       host: localhost
       port: 63792
+      connect-timeout: 1000
+      timeout: 2000
     mongodb:
       uri: mongodb://kream:kream@localhost:27017/kream?authSource=admin
       database: kream

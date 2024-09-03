@@ -21,12 +21,15 @@ class RegisterProductService(
     private val productDisplayRepository: ProductDisplayRepository,
 ) : RegisterProductUseCase {
     override suspend fun registerProduct(command: RegisterProductCommand): RegisterProductResponseDto = coroutineScope {
-        val productBrand = async {
+        val productBrandDeferred = async {
             productReaderUseCase.findBrandById(command.brandId) ?: throw ProductBrandNotFoundException()
-        }.await()
-        val productCategory = async {
+        }
+        val productCategoryDeferred = async {
             productReaderUseCase.findCategoryById(command.categoryId) ?: throw ProductCategoryNotFoundException()
-        }.await()
+        }
+
+        val productBrand = productBrandDeferred.await()
+        val productCategory = productCategoryDeferred.await()
 
         val product = Product.create(
             name = command.name,
@@ -54,6 +57,6 @@ class RegisterProductService(
             category = productCategory.name,
         )
         productDisplayRepository.save(productDisplay)
-        return@coroutineScope savedProduct
+        savedProduct
     }
 }

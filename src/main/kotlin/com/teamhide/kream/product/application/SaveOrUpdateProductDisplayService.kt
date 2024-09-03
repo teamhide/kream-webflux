@@ -31,12 +31,15 @@ class SaveOrUpdateProductDisplayService(
     private suspend fun handleNewProductDisplay(command: SaveOrUpdateProductDisplayCommand) = coroutineScope {
         val product = productReaderUseCase.findProductById(productId = command.productId) ?: return@coroutineScope
 
-        val brand = async {
+        val brandDeferred = async {
             productReaderUseCase.findBrandById(brandId = product.productBrandId)
-        }.await()
-        val category = async {
+        }
+        val categoryDeferred = async {
             productReaderUseCase.findCategoryById(categoryId = product.productCategoryId)
-        }.await()
+        }
+
+        val brand = brandDeferred.await()
+        val category = categoryDeferred.await()
         if (brand == null || category == null) return@coroutineScope
 
         val productDisplay = ProductDisplay(

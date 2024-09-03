@@ -26,9 +26,8 @@ import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseCommand
 import com.teamhide.kream.product.domain.usecase.ImmediatePurchaseResponseDto
 import com.teamhide.kream.product.domain.usecase.ProductReaderUseCase
 import com.teamhide.kream.user.application.exception.UserNotFoundException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Service
 
 @Service
@@ -43,16 +42,16 @@ class BiddingService(
     private val outboxRepository: OutboxRepository,
     private val objectMapper: ObjectMapper,
 ) : BiddingUseCase {
-    override suspend fun bid(command: BidCommand): BidResponseDto {
+    override suspend fun bid(command: BidCommand): BidResponseDto = coroutineScope {
         if (!canBid(productId = command.productId, price = command.price, biddingType = command.biddingType)) {
             throw ImmediateTradeAvailableException()
         }
 
-        val userDeferred = CoroutineScope(Dispatchers.IO).async {
+        val userDeferred = async {
             productUserAdapter.findById(userId = command.userId)
                 ?: throw UserNotFoundException()
         }
-        val productDeferred = CoroutineScope(Dispatchers.IO).async {
+        val productDeferred = async {
             productReaderUseCase.findProductById(productId = command.productId)
                 ?: throw ProductNotFoundException()
         }
@@ -83,7 +82,7 @@ class BiddingService(
             price = bidding.price,
         )
         biddingKafkaAdapter.sendBiddingCreated(event = event)
-        return response
+        response
     }
 
     private suspend fun canBid(productId: Long, price: Int, biddingType: BiddingType): Boolean {
