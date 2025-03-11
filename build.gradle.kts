@@ -44,6 +44,7 @@ dependencies {
     implementation("com.mysql:mysql-connector-j")
     implementation("io.projectreactor.kafka:reactor-kafka")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+    implementation("io.kotest:kotest-extensions-blockhound:5.9.1")
 
     runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.112.Final:osx-aarch_64")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")

@@ -16,6 +16,7 @@ import com.teamhide.kream.user.application.exception.UserNotFoundException
 import com.teamhide.kream.user.domain.repository.UserRepository
 import com.teamhide.kream.user.makeUser
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.extensions.blockhound.BlockHound
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -31,6 +32,8 @@ class BidProductV1ControllerTest(
     private val testTokenProvider: TestTokenProvider,
     private val webTestClient: WebTestClient,
 ) : BehaviorSpec({
+    extensions(BlockHound())
+
     afterEach {
         biddingRepository.deleteAll()
         userRepository.deleteAll()
